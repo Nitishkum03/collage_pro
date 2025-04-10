@@ -1,6 +1,6 @@
 import { useState ,useEffect } from "react";
 import {FiPlus,FiSearch} from "react-icons/fi";
-import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
+import { FaCheckCircle, FaRegCircle,FaCalendarAlt, FaChartPie , FaHome} from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import "react-toastify/dist/ReactToastify.css";
@@ -184,13 +184,12 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
           <h2 className="text-2xl font-semibold">
             {filter === "All" ? "All Tasks" : `${filter} Tasks`}
           </h2> 
-          <div className="flex space-x-6 text-xl font-semibold text-gray-500 ">
-          <button className="cursor-pointer">Home</button>
-          <button className="cursor-pointer" >Calendar</button>
-          <button className="cursor-pointer">Pie Chart</button>
+          <div className="flex space-x-6 text-2xl font-semibold text-gray-500  gap-10 items-center"> 
+          <button className="cursor-pointer"><FaHome></FaHome></button>
+          <button className="cursor-pointer" ><FaCalendarAlt date={new Date()}/></button>
+          <button className="cursor-pointer"><FaChartPie>Pie</FaChartPie></button>
+          <button className="cursor-pointer" onClick={() => setShowModal(true)}><FiPlus>Add</FiPlus></button>
           </div>
-          
-         
           <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
             <div className="relative">
               <FiSearch className="absolute top-3 left-3 text-gray-400" />
@@ -253,8 +252,11 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
           })}
         </div>
               <div className="p-6 bg-gray-100 rounded-lg justify-center items-center gap-10">
-                {/* <TodoCalendar tasks={tasks} /> */}
-                <h3 className="text-lg font-semibold mt-4">Task Calendar</h3>
+                <div className="flex justify-between items-center"> 
+                  <h3 className="text-lg font-semibold mt-4">Task Calendar</h3>
+                <button className="cursor-pointer" onClick={() => setShowModal(true)}><FiPlus>Add</FiPlus></button>
+                </div>
+               
                 <div className="bg-white p-4 rounded-lg shadow mt-4">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-semibold">{new Date().toLocaleString("default", { month: "long" })} {new Date().getFullYear()}</span>
