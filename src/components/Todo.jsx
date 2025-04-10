@@ -3,10 +3,10 @@ import {FiPlus,FiSearch} from "react-icons/fi";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-
 import "react-toastify/dist/ReactToastify.css";
 export default function TaskMaster() {
-  
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tasks,setTasks]=useState([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,9 +14,20 @@ export default function TaskMaster() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const now = new Date();
 
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  useEffect(() => {
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+      setIsAuthenticated(true);
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  }, [loggedInUser]);
 // Count overdue tasks
 const overdueCount = tasks.filter(
   (task) => new Date(task.date) < now && task.status !== "Completed"
@@ -78,6 +89,12 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
     setShowModal(false);
     toast.success("Task added Successfully!");
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInUser");
+    setIsAuthenticated(false);
+    toast.success("Logged out successfully!");
+  };
   const toggleStatus = (index) => {
     const updatedTasks = [...tasks];
     updatedTasks[index].status =
@@ -109,6 +126,12 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
       default:
         return "text-blue-500 border-blue-300";
     }
+  };
+  const deletetask = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    setTasks(updatedTasks);
+    toast.success("Task deleted successfully!");
   };
   return (
     <div className="flex h-screen bg-gray-100">
@@ -149,7 +172,7 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
             </ul>
           </div>
           <div className="p-6 flex items-center mt-auto">
-          <button onClick={() => { localStorage.removeItem("loggedInUser"); setIsAuthenticated(false);}} className=" bg-red-600 w-100 cursor-pointer  text-white px-4 py-2 rounded hover:bg-red-700">
+          <button onClick={() => {localStorage.removeItem("loggedInUser"); handleLogout()}} className=" bg-red-600 w-100 cursor-pointer  text-white px-4 py-2 rounded hover:bg-red-700">
             Logout
           </button>
           </div>
@@ -160,12 +183,20 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
           <h2 className="text-2xl font-semibold">
             {filter === "All" ? "All Tasks" : `${filter} Tasks`}
-          </h2>
+          </h2> 
+          <div className="flex space-x-6 text-xl font-semibold text-gray-500 ">
+          <button className="cursor-pointer">Home</button>
+          <button className="cursor-pointer" >Calendar</button>
+          <button className="cursor-pointer">Pie Chart</button>
+          </div>
+          
+         
           <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
             <div className="relative">
               <FiSearch className="absolute top-3 left-3 text-gray-400" />
               <input type="text" placeholder="Search tasks..." className="pl-10 pr-4 py-2 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
             </div>
+           
             {/* Add Task button */}
             <button onClick={() => setShowModal(true)} className="inline-flex items-center cursor-pointer bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
             >
@@ -208,10 +239,14 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
                       onClick={() => toggleStatus(index)}
                     />
                   )}
-                  <span
+                  <div className="flex justify-between items-center w-full">
+                     <span
                     className={`${task.status === "Completed"? "text-green-600": "text-gray-600"}`}>
                     {task.status}
                   </span>
+                  <button className="cursor-pointer hover:underline hover:text-red-500 text-gray-500"onClick={()=>{deletetask()}}>delete Tasks</button>
+                  </div>
+                 
                 </div>
               </div>
             );
@@ -242,7 +277,8 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
   <button onClick={() => setSelectedDate(null)} className="text-blue-500 hover:underline cursor-pointer">Clear</button>
   </div>
   <div>
-  <div className="bg-white p-4 rounded-lg shadow mt-4">
+    { 
+     <div className="bg-white p-4 rounded-lg shadow mt-4">
     {tasks.filter((task) => task.date === selectedDate).length ? (tasks.filter((task) => task.date === selectedDate).map((task) => (
       <div key={task.id} className="p-3 mb-2 shadow-xl rounded flex justify-between items-start">
         <div>
@@ -274,7 +310,8 @@ const daysInMonth = new Date(year, month + 1, 0).getDate();
     <p className="text-gray-500">No tasks for this day.</p>
     )}
 
-  </div>
+  </div>}
+  
   </div>
   </div>
   <div className="bg-white p-6 rounded-lg shadow mt-8">
